@@ -75,14 +75,8 @@ public class RobotContainer {
       .whenInactive(() -> m_slowMode = false);
 
     JoystickButton yButton = new JoystickButton(m_controller, XboxController.Button.kY.value);
-    yButton.whenActive(() -> turnAround());
+    yButton.whenActive(getTurnAroundCommand());
 
-
-    // Example of how to use the onboard IO
-    Button onboardButtonA = new Button(m_onboardIO::getButtonAPressed);
-    onboardButtonA
-        .whenActive(new PrintCommand("Button A Pressed"))
-        .whenInactive(new PrintCommand("Button A Released"));
 
     // Setup SmartDashboard options
     m_chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
@@ -104,35 +98,16 @@ public class RobotContainer {
    *
    * @return the command to run in teleop
    */
-  public Command getArcadeDriveCommand() {
-    return new ArcadeDrive(
-        //m_drivetrain, () -> -m_controller.getRawAxis(1), () -> m_controller.getRawAxis(2));
-        m_drivetrain, () -> getXRate(), () -> getYRate());
-  }
-
-  private double getXRate()
+  public Command getArcadeDriveCommand()
   {
-    double xRate = -m_controller.getLeftY()/(m_slowMode ? 2 :1);
-    return xRate;
+     return new ArcadeDrive(m_drivetrain, 
+        () -> -m_controller.getLeftY()  / (m_slowMode ? 2 : 1), 
+        () ->  m_controller.getRightX() / (m_slowMode ? 2 : 1));
   }
 
-  private double getYRate()
+  public Command getTurnAroundCommand()
   {
-    double xRate = m_controller.getRightX()/(m_slowMode ? 2 :1);
-    return xRate;
-  }
+    return new TurnAroundCommand(m_drivetrain);
+  } 
 
-  private void turnAround()
-  {
-     // Get selected routine from the SmartDashboard
-    TurnAroundCommand turnAroundCommand = new TurnAroundCommand(m_drivetrain);
-
-
-   
-
-     // schedule the autonomous command (example)
-     if (turnAroundCommand != null) {
-       turnAroundCommand.schedule();
-     }
-  }
 }
