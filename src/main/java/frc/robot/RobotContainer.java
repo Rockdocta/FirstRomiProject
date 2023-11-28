@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
-import frc.robot.commands.DriveDistance;
-import frc.robot.commands.TurnAroundCommand;
+import frc.robot.commands.DrawSquare;
+import frc.robot.commands.DrawTriangle;
 import frc.robot.commands.TurnDegrees;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.OnBoardIO;
@@ -66,16 +66,33 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command is arcade drive. This will run unless another command
-    // is scheduled over it.
-    m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
+      // Default command is arcade drive. This will run unless another command
+      // is scheduled over it.
+      m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
     
-    JoystickButton leftJoystickButton = new JoystickButton(m_controller, XboxController.Button.kRightBumper.value);
-    leftJoystickButton.whenActive(() -> m_slowMode = true)
+      JoystickButton leftJoystickButton = new JoystickButton(m_controller, XboxController.Button.kRightBumper.value);
+      leftJoystickButton.whenActive(() -> m_slowMode = true)
       .whenInactive(() -> m_slowMode = false);
 
-    JoystickButton yButton = new JoystickButton(m_controller, XboxController.Button.kY.value);
-    yButton.whenActive(getTurnAroundCommand());
+      JoystickButton xButton = new JoystickButton(m_controller, XboxController.Button.kX.value);
+      xButton.whenActive(() ->
+      {
+        Command command = new DrawTriangle(m_drivetrain);
+        command.schedule();
+      });
+
+      JoystickButton yButton = new JoystickButton(m_controller, XboxController.Button.kY.value);
+      yButton.whenActive(() -> {
+        Command command = getTurnAroundCommand();
+        command.schedule();
+      });
+
+     JoystickButton aButton = new JoystickButton(m_controller, XboxController.Button.kA.value);
+      aButton.whenActive(() ->
+      {
+        Command command = new DrawSquare(m_drivetrain);
+        command.schedule();
+      });
 
 
     // Setup SmartDashboard options
@@ -107,7 +124,7 @@ public class RobotContainer {
 
   public Command getTurnAroundCommand()
   {
-    return new TurnAroundCommand(m_drivetrain);
+    return new TurnDegrees(.5, 180, m_drivetrain);
   } 
 
 }
