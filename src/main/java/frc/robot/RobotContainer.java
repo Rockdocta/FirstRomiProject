@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
+import frc.robot.commands.Commands;
 import frc.robot.commands.DrawSquare;
 import frc.robot.commands.DrawTriangle;
 import frc.robot.commands.TurnDegrees;
@@ -40,6 +41,8 @@ public class RobotContainer {
   // Create SmartDashboard chooser for autonomous routines
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
+    boolean m_slowMode = false;
+
   // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
   // that is specified when launching the wpilib-ws server on the Romi raspberry pi.
   // By default, the following are available (listed in order from inside of the board to outside):
@@ -52,54 +55,20 @@ public class RobotContainer {
   // Your subsystem configuration should take the overlays into account
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+  public RobotContainer() 
+  {
     // Configure the button bindings
-    configureButtonBindings();
-  }
+    ConfigureJoystick();
 
-  boolean m_slowMode = false;
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-      // Default command is arcade drive. This will run unless another command
-      // is scheduled over it.
-      m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
+    m_drivetrain.setDefaultCommand(Commands.getArcadeDriveCommand(m_controller.getRightY(), m_controller.getLeftX()));
     
-      JoystickButton leftJoystickButton = new JoystickButton(m_controller, XboxController.Button.kRightBumper.value);
-      leftJoystickButton.whenActive(() -> m_slowMode = true)
-      .whenInactive(() -> m_slowMode = false);
-
-      JoystickButton xButton = new JoystickButton(m_controller, XboxController.Button.kX.value);
-      xButton.whenActive(() ->
-      {
-        Command command = new DrawTriangle(m_drivetrain);
-        command.schedule();
-      });
-
-      JoystickButton yButton = new JoystickButton(m_controller, XboxController.Button.kY.value);
-      yButton.whenActive(() -> {
-        Command command = getTurnAroundCommand();
-        command.schedule();
-      });
-
-     JoystickButton aButton = new JoystickButton(m_controller, XboxController.Button.kA.value);
-      aButton.whenActive(() ->
-      {
-        Command command = new DrawSquare(m_drivetrain);
-        command.schedule();
-      });
-
-
     // Setup SmartDashboard options
     m_chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
     m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     SmartDashboard.putData(m_chooser);
+
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -110,21 +79,32 @@ public class RobotContainer {
     return m_chooser.getSelected();
   }
 
-  /**
-   * Use this to pass the teleop command to the main {@link Robot} class.
-   *
-   * @return the command to run in teleop
-   */
-  public Command getArcadeDriveCommand()
+  public void ConfigureJoystick()
   {
-     return new ArcadeDrive(m_drivetrain, 
-        () -> -m_controller.getLeftY()  / (m_slowMode ? 2 : 1), 
-        () ->  m_controller.getRightX() / (m_slowMode ? 2 : 1));
+
+      JoystickButton leftJoystickButton = new JoystickButton(m_controller, XboxController.Button.kRightBumper.value);
+      leftJoystickButton.whenActive(() -> m_slowMode = true)
+      .whenInactive(() -> m_slowMode = false);
+
+      JoystickButton xButton = new JoystickButton(m_controller, XboxController.Button.kX.value);
+      xButton.whenActive(() ->
+      {
+        Command command = Commands.getDrawTriangleCommand();
+        command.schedule();
+      });
+
+      JoystickButton yButton = new JoystickButton(m_controller, XboxController.Button.kY.value);
+      yButton.whenActive(() -> 
+      {
+        Command command = Commands.getTurnAroundCommand();
+        command.schedule();
+      });
+
+      JoystickButton aButton = new JoystickButton(m_controller, XboxController.Button.kA.value);
+      aButton.whenActive(() ->
+      {
+        Command command = Commands.getDrawSquareCommand();
+        command.schedule();
+      });
   }
-
-  public Command getTurnAroundCommand()
-  {
-    return new TurnDegrees(.5, 180, m_drivetrain);
-  } 
-
 }

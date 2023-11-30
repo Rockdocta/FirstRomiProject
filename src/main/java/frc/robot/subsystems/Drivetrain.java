@@ -11,7 +11,7 @@ import frc.robot.sensors.RomiGyro;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain implements IDrivetrain {
   private static final double kCountsPerRevolution = 1440.0;
   private static final double kWheelDiameterInch = 2.75591; // 70 mm
 
@@ -47,31 +47,38 @@ public class Drivetrain extends SubsystemBase {
     resetEncoders();
   }
 
+  @Override
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
 
+  @Override
   public void resetEncoders() {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
   }
 
+  @Override
   public int getLeftEncoderCount() {
     return m_leftEncoder.get();
   }
 
+  @Override
   public int getRightEncoderCount() {
     return m_rightEncoder.get();
   }
 
+  @Override
   public double getLeftDistanceInch() {
     return m_leftEncoder.getDistance();
   }
 
+  @Override
   public double getRightDistanceInch() {
     return m_rightEncoder.getDistance();
   }
 
+  @Override
   public double getAverageDistanceInch() {
     return (getLeftDistanceInch() + getRightDistanceInch()) / 2.0;
   }
@@ -81,6 +88,7 @@ public class Drivetrain extends SubsystemBase {
    *
    * @return The acceleration of the Romi along the X-axis in Gs
    */
+  @Override
   public double getAccelX() {
     return m_accelerometer.getX();
   }
@@ -90,6 +98,7 @@ public class Drivetrain extends SubsystemBase {
    *
    * @return The acceleration of the Romi along the Y-axis in Gs
    */
+  @Override
   public double getAccelY() {
     return m_accelerometer.getY();
   }
@@ -99,6 +108,7 @@ public class Drivetrain extends SubsystemBase {
    *
    * @return The acceleration of the Romi along the Z-axis in Gs
    */
+  @Override
   public double getAccelZ() {
     return m_accelerometer.getZ();
   }
@@ -108,6 +118,7 @@ public class Drivetrain extends SubsystemBase {
    *
    * @return The current angle of the Romi in degrees
    */
+  @Override
   public double getGyroAngleX() {
     return m_gyro.getAngleX();
   }
@@ -117,6 +128,7 @@ public class Drivetrain extends SubsystemBase {
    *
    * @return The current angle of the Romi in degrees
    */
+  @Override
   public double getGyroAngleY() {
     return m_gyro.getAngleY();
   }
@@ -126,11 +138,13 @@ public class Drivetrain extends SubsystemBase {
    *
    * @return The current angle of the Romi in degrees
    */
+  @Override
   public double getGyroAngleZ() {
     return m_gyro.getAngleZ();
   }
 
   /** Reset the gyro. */
+  @Override
   public void resetGyro() {
     m_gyro.reset();
   }
