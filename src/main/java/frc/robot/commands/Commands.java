@@ -4,14 +4,18 @@ import frc.robot.subsystems.IDrivetrain;
 
 public class Commands {
 
-    public static IDrivetrain Drivetrain;
+    private static IDrivetrain _drivetrain;
+    public static void setDrivetrain(IDrivetrain drivetrain)
+    {
+        _drivetrain = drivetrain;
+    }
 
     private static IDrivetrain getDrivetrain()
     {
-        if (Drivetrain == null)
+        if (_drivetrain == null)
             throw new IllegalStateException("The Drivetrain variable must be initialized prior to using the Commands methods.");
 
-        return Drivetrain;
+        return _drivetrain;
     }
 
     public static TurnDegrees getTurnAroundCommand()
